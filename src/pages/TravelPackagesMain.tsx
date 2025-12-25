@@ -1,0 +1,14 @@
+import FeatureOne from "../components/features/feature-one"
+import SEO from "../components/SEO"
+import Wrapper from "../layouts/Wrapper"
+
+const TravelPackagesMain = () => {
+   return (
+      <Wrapper>
+         <SEO pageTitle={'Travel Packages'} />
+         <FeatureOne />
+      </Wrapper>
+   )
+}
+
+export default TravelPackagesMain
