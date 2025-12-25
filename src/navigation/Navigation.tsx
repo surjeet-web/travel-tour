@@ -11,6 +11,9 @@ import AdminLogin from '../admin/pages/Login';
 import AdminDashboard from '../admin/pages/Dashboard';
 import TravelPackagesAdmin from '../admin/pages/TravelPackages';
 import CarRentalsAdmin from '../admin/pages/CarRentals';
+import DestinationsAdmin from '../admin/pages/Destinations';
+import SlidersAdmin from '../admin/pages/Sliders';
+import SettingsAdmin from '../admin/pages/Settings';
 
 // Lazy load only the pages we need
 const HomeOneMain = lazy(() => import('../pages/HomeOneMain'));
@@ -73,6 +76,9 @@ const AppNavigation = () => {
                       <Route path="/" element={<AdminDashboard />} />
                       <Route path="/packages" element={<TravelPackagesAdmin />} />
                       <Route path="/cars" element={<CarRentalsAdmin />} />
+                      <Route path="/destinations" element={<DestinationsAdmin />} />
+                      <Route path="/sliders" element={<SlidersAdmin />} />
+                      <Route path="/settings" element={<SettingsAdmin />} />
                     </Routes>
                   </AdminLayout>
                 </ProtectedRoute>
