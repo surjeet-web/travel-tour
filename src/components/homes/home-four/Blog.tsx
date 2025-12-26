@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
-import blog_data from "../../../data/BlogData";
+// import { Link } from "react-router-dom";
+// import blog_data from "../../../data/BlogData";
 
 const Blog = () => {
    return (
       <div className="tg-blog-area tg-blog-space-2 pt-130 p-relative z-index-1">
-         <img className="tg-blog-2-shape p-absolute d-none d-xl-block" src="/assets/img/blog/blog-2/shape-2.png" alt="" />
+         {/* <img className="tg-blog-2-shape p-absolute d-none d-xl-block" src="/assets/img/blog/blog-2/shape-2.png" alt="" />
          <img className="tg-blog-2-shape-1 p-absolute d-none d-xl-block" src="/assets/img/blog/blog-2/shape.png" alt="" />
          <div className="container">
             <div className="row">
@@ -40,7 +40,7 @@ const Blog = () => {
                   </div>
                </div>
             </div>
-         </div>
+         </div> */}
       </div>
    )
 }

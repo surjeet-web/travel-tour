@@ -8,12 +8,18 @@ import SkeletonLoader from '../components/common/skeleton/SkeletonLoader';
 import ProtectedRoute from '../admin/components/ProtectedRoute';
 import AdminLayout from '../admin/components/layout/AdminLayout';
 import AdminLogin from '../admin/pages/Login';
-import AdminDashboard from '../admin/pages/Dashboard';
-import TravelPackagesAdmin from '../admin/pages/TravelPackages';
-import CarRentalsAdmin from '../admin/pages/CarRentals';
-import DestinationsAdmin from '../admin/pages/Destinations';
-import SlidersAdmin from '../admin/pages/Sliders';
-import SettingsAdmin from '../admin/pages/Settings';
+
+// Lazy load admin pages
+const AdminDashboard = lazy(() => import('../admin/pages/Dashboard'));
+const TravelPackagesAdmin = lazy(() => import('../admin/pages/TravelPackages'));
+const CarRentalsAdmin = lazy(() => import('../admin/pages/CarRentals'));
+const DestinationsAdmin = lazy(() => import('../admin/pages/Destinations'));
+const BlogPostsAdmin = lazy(() => import('../admin/pages/BlogPosts'));
+const TestimonialsAdmin = lazy(() => import('../admin/pages/Testimonials'));
+const FaqsAdmin = lazy(() => import('../admin/pages/Faqs'));
+const TeamMembersAdmin = lazy(() => import('../admin/pages/TeamMembers'));
+const SlidersAdmin = lazy(() => import('../admin/pages/Sliders'));
+const SettingsAdmin = lazy(() => import('../admin/pages/Settings'));
 
 // Lazy load only the pages we need
 const HomeOneMain = lazy(() => import('../pages/HomeOneMain'));
@@ -77,6 +83,10 @@ const AppNavigation = () => {
                       <Route path="/packages" element={<TravelPackagesAdmin />} />
                       <Route path="/cars" element={<CarRentalsAdmin />} />
                       <Route path="/destinations" element={<DestinationsAdmin />} />
+                      <Route path="/blog" element={<BlogPostsAdmin />} />
+                      <Route path="/testimonials" element={<TestimonialsAdmin />} />
+                      <Route path="/faqs" element={<FaqsAdmin />} />
+                      <Route path="/team" element={<TeamMembersAdmin />} />
                       <Route path="/sliders" element={<SlidersAdmin />} />
                       <Route path="/settings" element={<SettingsAdmin />} />
                     </Routes>

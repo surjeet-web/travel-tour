@@ -41,23 +41,10 @@ const optimizePerformance = () => {
 const registerServiceWorker = async () => {
   if ('serviceWorker' in navigator) {
     try {
-      const registration = await navigator.serviceWorker.register('/sw-optimized.js');
-      console.log('SW registered: ', registration);
-      
-      // Update service worker when new version is available
-      registration.addEventListener('updatefound', () => {
-        const newWorker = registration.installing;
-        if (newWorker) {
-          newWorker.addEventListener('statechange', () => {
-            if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-              // New version available, show update notification
-              console.log('New version available! Please refresh.');
-            }
-          });
-        }
-      });
+      const registration = await navigator.serviceWorker.register('/sw-advanced.js');
+      console.log('🚀 Advanced SW registered: ', registration);
     } catch (error) {
-      console.log('SW registration failed: ', error);
+      console.log('❌ SW registration failed: ', error);
     }
   }
 };
@@ -74,36 +61,43 @@ trackWebVitals();
 // Register service worker
 registerServiceWorker();
 
-// Preload critical resources
+// Preload critical resources for instant loading
 const preloadCriticalResources = () => {
-  // Preload critical CSS
+  // Only preload resources that will actually be used
   const criticalCSS = [
-    '/assets/css/bootstrap.min.css',
-    '/assets/css/fontawesome-all.min.css'
+    '/assets/css/bootstrap.min.css'
   ];
   
   criticalCSS.forEach(href => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.href = href;
-    link.as = 'style';
-    document.head.appendChild(link);
+    // Check if already preloaded
+    if (!document.querySelector(`link[href="${href}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.href = href;
+      link.as = 'style';
+      link.onload = () => {
+        // Convert to stylesheet after loading
+        link.rel = 'stylesheet';
+      };
+      document.head.appendChild(link);
+    }
   });
 
-  // Preload critical fonts
+  // Preload critical fonts that are actually used
   const criticalFonts = [
-    '/assets/fonts/fa-solid-900.woff2',
-    '/assets/fonts/fa-regular-400.woff2'
+    '/assets/fonts/fa-solid-900.woff2'
   ];
   
   criticalFonts.forEach(href => {
-    const link = document.createElement('link');
-    link.rel = 'preload';
-    link.href = href;
-    link.as = 'font';
-    link.type = 'font/woff2';
-    link.crossOrigin = 'anonymous';
-    document.head.appendChild(link);
+    if (!document.querySelector(`link[href="${href}"]`)) {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.href = href;
+      link.as = 'font';
+      link.type = 'font/woff2';
+      link.crossOrigin = 'anonymous';
+      document.head.appendChild(link);
+    }
   });
 };
 

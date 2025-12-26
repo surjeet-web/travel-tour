@@ -34,6 +34,9 @@ interface CarRental {
   review_count?: number;
   is_featured: boolean;
   is_active: boolean;
+  meta_title?: string;
+  meta_description?: string;
+  meta_keywords?: string;
   created_at?: string;
   updated_at?: string;
 }
@@ -53,6 +56,9 @@ const CarRentals: React.FC = () => {
     price_per_day: 0,
     is_featured: false,
     is_active: true,
+    meta_title: '',
+    meta_description: '',
+    meta_keywords: '',
   });
 
   useEffect(() => {
@@ -153,6 +159,9 @@ const CarRentals: React.FC = () => {
       price_per_day: 0,
       is_featured: false,
       is_active: true,
+      meta_title: '',
+      meta_description: '',
+      meta_keywords: '',
     });
   };
 
@@ -415,6 +424,42 @@ const CarRentals: React.FC = () => {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
                 />
+              </div>
+
+              <div className="pt-2 border-t">
+                <h4 className="text-md font-semibold text-gray-800 mb-2">SEO Settings</h4>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Meta Title</label>
+                    <input
+                      type="text"
+                      value={formData.meta_title || ''}
+                      onChange={(e) => setFormData({ ...formData, meta_title: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      placeholder="Title for search engines (optional)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Meta Description</label>
+                    <textarea
+                      rows={2}
+                      value={formData.meta_description || ''}
+                      onChange={(e) => setFormData({ ...formData, meta_description: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      placeholder="Description for search engines (optional)"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700">Meta Keywords</label>
+                    <input
+                      type="text"
+                      value={formData.meta_keywords || ''}
+                      onChange={(e) => setFormData({ ...formData, meta_keywords: e.target.value })}
+                      className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
+                      placeholder="Comma-separated keywords (optional)"
+                    />
+                  </div>
+                </div>
               </div>
 
               <div>

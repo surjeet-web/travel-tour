@@ -6,6 +6,11 @@ import { resolve } from 'path'
 export default defineConfig({
   plugins: [react()],
   
+  define: {
+    global: 'globalThis',
+    'process.env': {}
+  },
+  
   // Performance optimizations
   build: {
     target: 'esnext',

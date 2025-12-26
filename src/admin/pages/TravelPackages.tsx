@@ -1,350 +1,356 @@
-import React, { useState, useEffect } from 'react';
-import { supabase } from '../../utils/supabase';
-import toast from 'react-hot-toast';
-import DataTable from '../components/tables/DataTable';
-import ImageUpload from '../components/common/ImageUpload';
-import {
-  PlusIcon,
-  XMarkIcon,
-} from '@heroicons/react/24/outline';
+import { Link } from "react-router-dom";
+import { useState } from "react";
 
-interface TravelPackage {
-  id?: string;
-  title: string;
-  slug: string;
-  description: string;
-  short_description: string;
-  price: number;
-  original_price?: number;
-  duration_days?: number;
-  destination: string;
-  country?: string;
-  category?: string;
-  featured_image?: string;
-  gallery?: any[];
-  features?: any[];
-  is_featured: boolean;
-  is_active: boolean;
-  created_at?: string;
-  updated_at?: string;
-}
+const FooterOne = () => {
+   const [email, setEmail] = useState("");
+   const [isSubscribed, setIsSubscribed] = useState(false);
 
-const TravelPackages: React.FC = () => {
-  const [packages, setPackages] = useState<TravelPackage[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [editingPackage, setEditingPackage] = useState<TravelPackage | null>(null);
-  const [formData, setFormData] = useState<TravelPackage>({
-    title: '',
-    slug: '',
-    description: '',
-    short_description: '',
-    price: 0,
-    destination: '',
-    is_featured: false,
-    is_active: true,
-  });
-
-  useEffect(() => {
-    fetchPackages();
-  }, []);
-
-  const fetchPackages = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('travel_packages')
-        .select('*')
-        .order('created_at', { ascending: false });
-
-      if (error) throw error;
-      setPackages(data || []);
-    } catch (error) {
-      toast.error('Error fetching packages');
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-
-    try {
-      const packageData = {
-        ...formData,
-        slug: formData.title.toLowerCase().replace(/\s+/g, '-').replace(/[^\w-]/g, ''),
-        updated_at: new Date().toISOString(),
-      };
-
-      if (editingPackage?.id) {
-        // Update existing package
-        const { error } = await supabase
-          .from('travel_packages')
-          .update(packageData)
-          .eq('id', editingPackage.id);
-
-        if (error) throw error;
-        toast.success('Package updated successfully!');
-      } else {
-        // Create new package
-        const { error } = await supabase
-          .from('travel_packages')
-          .insert([packageData]);
-
-        if (error) throw error;
-        toast.success('Package created successfully!');
+   const handleSubscribe = (e: React.FormEvent) => {
+      e.preventDefault();
+      if (email) {
+         setIsSubscribed(true);
+         setEmail("");
+         setTimeout(() => setIsSubscribed(false), 4000);
       }
+   };
 
-      setShowModal(false);
-      setEditingPackage(null);
-      resetForm();
-      fetchPackages();
-    } catch (error) {
-      toast.error('Error saving package');
-      console.error('Error:', error);
-    } finally {
-      setLoading(false);
-    }
-  };
+   return (
+      <>
+         <style>{`
+            :root {
+               --primary-glow: #00BFA5;
+               --secondary-glow: #00E5FF;
+               --footer-bg: #0F172A;
+            }
 
-  const handleEdit = (pkg: TravelPackage) => {
-    setEditingPackage(pkg);
-    setFormData(pkg);
-    setShowModal(true);
-  };
+            .modern-footer {
+               background: var(--footer-bg);
+               position: relative;
+               overflow: hidden;
+               padding-top: 100px;
+               color: white;
+            }
 
-  const handleDelete = async (pkg: TravelPackage) => {
-    if (!confirm('Are you sure you want to delete this package?')) return;
+            /* --- Animated Background Shapes --- */
+            .shape-emitter {
+               position: absolute;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               pointer-events: none;
+               z-index: 1;
+            }
 
-    try {
-      const { error } = await supabase
-        .from('travel_packages')
-        .delete()
-        .eq('id', pkg.id);
+            .shape {
+               position: absolute;
+               border-radius: 50%;
+               filter: blur(60px);
+               opacity: 0.15;
+               animation: float 20s infinite alternate ease-in-out;
+            }
 
-      if (error) throw error;
-      toast.success('Package deleted successfully!');
-      fetchPackages();
-    } catch (error) {
-      toast.error('Error deleting package');
-      console.error('Error:', error);
-    }
-  };
+            .shape-1 { width: 400px; height: 400px; background: var(--primary-glow); top: -100px; right: -50px; }
+            .shape-2 { width: 300px; height: 300px; background: var(--secondary-glow); bottom: -50px; left: -50px; animation-delay: -5s; }
 
-  const resetForm = () => {
-    setFormData({
-      title: '',
-      slug: '',
-      description: '',
-      short_description: '',
-      price: 0,
-      destination: '',
-      is_featured: false,
-      is_active: true,
-    });
-  };
+            @keyframes float {
+               0% { transform: translate(0, 0) rotate(0deg); }
+               100% { transform: translate(50px, 100px) rotate(15deg); }
+            }
 
-  const openNewModal = () => {
-    setEditingPackage(null);
-    resetForm();
-    setShowModal(true);
-  };
+            /* --- Wave Divider --- */
+            .footer-wave {
+               position: absolute;
+               top: 0;
+               left: 0;
+               width: 100%;
+               line-height: 0;
+               transform: rotate(180deg);
+            }
 
-  const columns = [
-    { key: 'title', label: 'Title', sortable: true },
-    { key: 'destination', label: 'Destination', sortable: true },
-    { 
-      key: 'price', 
-      label: 'Price', 
-      sortable: true,
-      render: (value: number) => `$${value.toLocaleString()}`
-    },
-    { 
-      key: 'is_featured', 
-      label: 'Featured',
-      render: (value: boolean) => (
-        <span className={`px-2 py-1 text-xs rounded-full ${
-          value ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'
-        }`}>
-          {value ? 'Yes' : 'No'}
-        </span>
-      )
-    },
-    { 
-      key: 'is_active', 
-      label: 'Active',
-      render: (value: boolean) => (
-        <span className={`px-2 py-1 text-xs rounded-full ${
-          value ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-        }`}>
-          {value ? 'Yes' : 'No'}
-        </span>
-      )
-    },
-  ];
+            .footer-wave svg {
+               position: relative;
+               display: block;
+               width: calc(100% + 1.3px);
+               height: 70px;
+            }
 
-  return (
-    <div>
-      <div className="mb-8 flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Travel Packages</h1>
-          <p className="mt-1 text-sm text-gray-600">
-            Manage your travel packages and tours
-          </p>
-        </div>
-        <button
-          onClick={openNewModal}
-          className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 flex items-center"
-        >
-          <PlusIcon className="h-5 w-5 mr-2" />
-          Add Package
-        </button>
-      </div>
+            .footer-wave .shape-fill { fill: #ffffff; }
 
-      <DataTable
-        data={packages}
-        columns={columns}
-        onEdit={handleEdit}
-        onDelete={handleDelete}
-        loading={loading}
-      />
+            /* --- Widget Styling --- */
+            .footer-content { position: relative; z-index: 5; }
 
-      {/* Modal */}
-      {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium text-gray-900">
-                {editingPackage ? 'Edit Package' : 'Add New Package'}
-              </h3>
-              <button
-                onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-500"
-              >
-                <XMarkIcon className="h-6 w-6" />
-              </button>
+            .modern-footer-widget {
+               background: rgba(255, 255, 255, 0.03);
+               backdrop-filter: blur(12px);
+               border-radius: 24px;
+               padding: 40px;
+               border: 1px solid rgba(255, 255, 255, 0.08);
+               height: 100%;
+               transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            }
+
+            .modern-footer-widget:hover {
+               transform: translateY(-10px);
+               background: rgba(255, 255, 255, 0.06);
+               border-color: rgba(0, 191, 165, 0.3);
+               box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+            }
+
+            .footer-logo img {
+               max-height: 50px;
+               filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+            }
+
+            /* --- Typography --- */
+            .footer-widget-title {
+               font-size: 22px;
+               font-weight: 800;
+               margin-bottom: 30px;
+               background: linear-gradient(to right, #fff, #94a3b8);
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+            }
+
+            /* --- Animated Links --- */
+            .footer-links li { margin-bottom: 15px; }
+            .footer-links a {
+               color: #94a3b8;
+               text-decoration: none;
+               display: inline-flex;
+               align-items: center;
+               transition: 0.3s;
+               position: relative;
+            }
+
+            .footer-links a::after {
+               content: '';
+               position: absolute;
+               width: 0;
+               height: 2px;
+               bottom: -4px;
+               left: 0;
+               background: var(--primary-glow);
+               transition: width 0.3s ease;
+            }
+
+            .footer-links a:hover { color: #fff; transform: translateX(8px); }
+            .footer-links a:hover::after { width: 100%; }
+
+            /* --- Newsletter --- */
+            .newsletter-form {
+               display: flex;
+               background: rgba(0, 0, 0, 0.2);
+               border-radius: 16px;
+               padding: 8px;
+               border: 1px solid rgba(255, 255, 255, 0.1);
+               transition: 0.3s;
+            }
+
+            .newsletter-form:focus-within {
+               border-color: var(--primary-glow);
+               box-shadow: 0 0 15px rgba(0, 191, 165, 0.2);
+            }
+
+            .newsletter-input {
+               background: transparent;
+               border: none;
+               padding: 12px;
+               color: white;
+               flex: 1;
+               outline: none;
+            }
+
+            .newsletter-btn {
+               background: var(--primary-glow);
+               color: white;
+               border: none;
+               padding: 10px 20px;
+               border-radius: 12px;
+               cursor: pointer;
+               transition: 0.3s;
+               font-weight: 600;
+            }
+
+            .newsletter-btn:hover {
+               transform: scale(1.05);
+               background: #00e676;
+            }
+
+            /* --- Success Animation --- */
+            .success-msg {
+               display: flex;
+               align-items: center;
+               gap: 10px;
+               color: #00e676;
+               margin-top: 15px;
+               font-weight: 500;
+               animation: slideIn 0.5s ease forwards;
+            }
+
+            @keyframes slideIn {
+               from { opacity: 0; transform: translateY(10px); }
+               to { opacity: 1; transform: translateY(0); }
+            }
+
+            /* --- Social Icons --- */
+            .social-container {
+               display: flex;
+               gap: 15px;
+               margin-top: 30px;
+            }
+
+            .social-item {
+               width: 45px;
+               height: 45px;
+               background: rgba(255,255,255,0.05);
+               border-radius: 12px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               color: white;
+               transition: 0.4s;
+               border: 1px solid rgba(255,255,255,0.1);
+            }
+
+            .social-item:hover {
+               background: var(--primary-glow);
+               transform: translateY(-5px) rotate(8deg);
+               border-color: transparent;
+            }
+
+            .copyright-bar {
+               padding: 30px 0;
+               border-top: 1px solid rgba(255,255,255,0.05);
+               margin-top: 80px;
+               text-align: center;
+               color: #64748b;
+            }
+         `}</style>
+
+         <footer className="modern-footer">
+            {/* Background Decorations */}
+            <div className="shape-emitter">
+               <div className="shape shape-1"></div>
+               <div className="shape shape-2"></div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Title</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.title}
-                  onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
+            {/* Wave Divider */}
+            <div className="footer-wave">
+               <svg data-name="Layer 1" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 120" preserveAspectRatio="none">
+                  <path d="M321.39,56.44c58-10.79,114.16-30.13,172-41.86,82.39-16.72,168.19-17.73,250.45-.39C823.78,31,906.67,72,985.66,92.83c70.05,18.48,146.53,26.09,214.34,3V0H0V27.35A600.21,600.21,0,0,0,321.39,56.44Z" className="shape-fill"></path>
+               </svg>
+            </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Destination</label>
-                <input
-                  type="text"
-                  required
-                  value={formData.destination}
-                  onChange={(e) => setFormData({ ...formData, destination: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
+            <div className="footer-content">
+               <div className="container">
+                  <div className="row g-4">
+                     
+                     {/* Brand Section */}
+                     <div className="col-xl-4 col-lg-4 col-md-12">
+                        <div className="modern-footer-widget">
+                           <div className="footer-logo mb-4">
+                              <Link to="/">
+                                 <img src="/assets/img/logo/logo-white.png" alt="Logo" />
+                              </Link>
+                           </div>
+                           <p className="mb-4" style={{color: '#94a3b8', lineHeight: '1.8'}}>
+                              Embark on journeys that redefine your perspective. We create 
+                              bespoke travel experiences for the modern explorer.
+                           </p>
+                           
+                           <h4 className="footer-widget-title" style={{fontSize: '18px', marginBottom: '15px'}}>Subscribe to the Muse</h4>
+                           <form onSubmit={handleSubscribe} className="newsletter-form">
+                              <input 
+                                 type="email" 
+                                 className="newsletter-input"
+                                 placeholder="your@email.com"
+                                 value={email}
+                                 onChange={(e) => setEmail(e.target.value)}
+                                 required
+                              />
+                              <button className="newsletter-btn" type="submit">Join</button>
+                           </form>
+                           {isSubscribed && (
+                              <div className="success-msg">
+                                 <i className="fa-solid fa-circle-check"></i>
+                                 <span>Welcome to the inner circle!</span>
+                              </div>
+                           )}
+                        </div>
+                     </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Price ($)</label>
-                  <input
-                    type="number"
-                    required
-                    step="0.01"
-                    value={formData.price}
-                    onChange={(e) => setFormData({ ...formData, price: parseFloat(e.target.value) })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                  />
-                </div>
+                     {/* Quick Navigation */}
+                     <div className="col-xl-2 col-lg-2 col-md-4 col-sm-6">
+                        <div className="modern-footer-widget">
+                           <h3 className="footer-widget-title">Explore</h3>
+                           <ul className="footer-links list-unstyled">
+                              <li><Link to="/">Our Story</Link></li>
+                              <li><Link to="/travel-packages">Destinations</Link></li>
+                              <li><Link to="/car-listing">Luxury Fleet</Link></li>
+                              <li><Link to="/contact">Guides</Link></li>
+                           </ul>
+                        </div>
+                     </div>
 
-                <div>
-                  <label className="block text-sm font-medium text-gray-700">Duration (Days)</label>
-                  <input
-                    type="number"
-                    value={formData.duration_days || ''}
-                    onChange={(e) => setFormData({ ...formData, duration_days: parseInt(e.target.value) })}
-                    className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                  />
-                </div>
-              </div>
+                     {/* Contact & Support */}
+                     <div className="col-xl-3 col-lg-3 col-md-4 col-sm-6">
+                        <div className="modern-footer-widget">
+                           <h3 className="footer-widget-title">Concierge</h3>
+                           <div className="d-flex align-items-center mb-3">
+                              <div className="social-item me-3" style={{width: '35px', height: '35px'}}>
+                                 <i className="fa-solid fa-phone" style={{fontSize: '14px'}}></i>
+                              </div>
+                              <span style={{color: '#94a3b8'}}>+1 (888) TRAVEL</span>
+                           </div>
+                           <div className="d-flex align-items-center mb-4">
+                              <div className="social-item me-3" style={{width: '35px', height: '35px'}}>
+                                 <i className="fa-solid fa-envelope" style={{fontSize: '14px'}}></i>
+                              </div>
+                              <span style={{color: '#94a3b8'}}>hello@tourex.com</span>
+                           </div>
+                           <div className="social-container">
+                              <Link to="#" className="social-item"><i className="fa-brands fa-facebook-f"></i></Link>
+                              <Link to="#" className="social-item"><i className="fa-brands fa-instagram"></i></Link>
+                              <Link to="#" className="social-item"><i className="fa-brands fa-x-twitter"></i></Link>
+                           </div>
+                        </div>
+                     </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Short Description</label>
-                <textarea
-                  rows={2}
-                  value={formData.short_description}
-                  onChange={(e) => setFormData({ ...formData, short_description: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
+                     {/* Location/Hours */}
+                     <div className="col-xl-3 col-lg-3 col-md-4">
+                        <div className="modern-footer-widget">
+                           <h3 className="footer-widget-title">The Studio</h3>
+                           <p style={{color: '#94a3b8', fontSize: '15px'}}>
+                              58 Street Commercial Road<br />
+                              Victoria, Melbourne 3004<br />
+                              Australia
+                           </p>
+                           <hr style={{borderColor: 'rgba(255,255,255,0.1)'}} />
+                           <div className="d-flex justify-content-between align-items-center">
+                              <span style={{fontSize: '13px', color: '#64748b'}}>MON - FRI</span>
+                              <span style={{fontSize: '13px', color: '#00BFA5'}}>09:00 - 18:00</span>
+                           </div>
+                        </div>
+                     </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
-                <textarea
-                  rows={4}
-                  value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                  className="mt-1 block w-full rounded-md border-gray-300 shadow-sm"
-                />
-              </div>
+                  </div>
+               </div>
 
-              <div>
-                <label className="block text-sm font-medium text-gray-700">Featured Image</label>
-                <ImageUpload
-                  value={formData.featured_image}
-                  onChange={(url) => setFormData({ ...formData, featured_image: url })}
-                />
-              </div>
+               <div className="copyright-bar">
+                  <div className="container">
+                     <p className="mb-0">
+                        © 2025 <span style={{color: '#fff', fontWeight: '600'}}>Tourex</span>. 
+                        Crafted with passion for global citizens. 
+                        <Link to="#" className="ms-3 text-secondary">Privacy</Link>
+                        <Link to="#" className="ms-3 text-secondary">Terms</Link>
+                     </p>
+                  </div>
+               </div>
+            </div>
+         </footer>
+      </>
+   )
+}
 
-              <div className="flex items-center space-x-4">
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_featured}
-                    onChange={(e) => setFormData({ ...formData, is_featured: e.target.checked })}
-                    className="rounded border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Featured</span>
-                </label>
-
-                <label className="flex items-center">
-                  <input
-                    type="checkbox"
-                    checked={formData.is_active}
-                    onChange={(e) => setFormData({ ...formData, is_active: e.target.checked })}
-                    className="rounded border-gray-300"
-                  />
-                  <span className="ml-2 text-sm text-gray-700">Active</span>
-                </label>
-              </div>
-
-              <div className="flex justify-end space-x-3 pt-4">
-                <button
-                  type="button"
-                  onClick={() => setShowModal(false)}
-                  className="bg-gray-300 text-gray-700 px-4 py-2 rounded-md hover:bg-gray-400"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 disabled:opacity-50"
-                >
-                  {editingPackage ? 'Update' : 'Create'} Package
-                </button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-    </div>
-  );
-};
-
-export default TravelPackages;
+export default FooterOne;

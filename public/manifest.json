@@ -1,79 +1,35 @@
 {
-  "name": "Tourex - Premium Travel & Car Rental Services",
+  "name": "Tourex - Travel & Tour Booking",
   "short_name": "Tourex",
-  "description": "Discover amazing travel packages and reliable car rental services with Tourex. Book your perfect vacation and rent quality vehicles at competitive prices.",
+  "description": "Premium travel and tour booking platform with car rentals",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",
-  "theme_color": "#2563eb",
+  "theme_color": "#00BFA5",
   "orientation": "portrait-primary",
-  "scope": "/",
-  "lang": "en-US",
+  "categories": ["travel", "lifestyle", "business"],
+  "lang": "en",
   "dir": "ltr",
-  "categories": ["travel", "business", "lifestyle"],
   "icons": [
     {
       "src": "/favicon.png",
-      "sizes": "32x32",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/img/icon-72x72.png",
-      "sizes": "72x72",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/img/icon-96x96.png",
-      "sizes": "96x96",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/img/icon-128x128.png",
-      "sizes": "128x128",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/img/icon-144x144.png",
-      "sizes": "144x144",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/img/icon-152x152.png",
-      "sizes": "152x152",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/img/icon-192x192.png",
       "sizes": "192x192",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     },
     {
-      "src": "/assets/img/icon-384x384.png",
-      "sizes": "384x384",
-      "type": "image/png"
-    },
-    {
-      "src": "/assets/img/icon-512x512.png",
+      "src": "/favicon.png", 
       "sizes": "512x512",
       "type": "image/png",
-      "purpose": "any maskable"
+      "purpose": "any"
     }
   ],
   "screenshots": [
     {
-      "src": "/assets/img/screenshot-wide.png",
+      "src": "/assets/img/hero/hero-1.jpg",
       "sizes": "1280x720",
-      "type": "image/png",
-      "form_factor": "wide",
-      "label": "Tourex Travel Packages"
-    },
-    {
-      "src": "/assets/img/screenshot-narrow.png",
-      "sizes": "640x1136",
-      "type": "image/png",
-      "form_factor": "narrow",
-      "label": "Tourex Mobile Experience"
+      "type": "image/jpeg",
+      "form_factor": "wide"
     }
   ],
   "shortcuts": [
@@ -82,32 +38,33 @@
       "short_name": "Packages",
       "description": "Browse travel packages",
       "url": "/travel-packages",
-      "icons": [
-        {
-          "src": "/assets/img/shortcut-travel.png",
-          "sizes": "96x96"
-        }
-      ]
+      "icons": [{ "src": "/favicon.png", "sizes": "96x96" }]
     },
     {
-      "name": "Car Rental",
+      "name": "Car Rentals",
       "short_name": "Cars",
-      "description": "Rent a car",
-      "url": "/car-listing",
-      "icons": [
-        {
-          "src": "/assets/img/shortcut-car.png",
-          "sizes": "96x96"
-        }
-      ]
+      "description": "Browse car rentals",
+      "url": "/car-rental-home",
+      "icons": [{ "src": "/favicon.png", "sizes": "96x96" }]
+    },
+    {
+      "name": "Admin Panel",
+      "short_name": "Admin",
+      "description": "Access admin panel",
+      "url": "/admin/login",
+      "icons": [{ "src": "/favicon.png", "sizes": "96x96" }]
     }
   ],
-  "related_applications": [],
   "prefer_related_applications": false,
+  "related_applications": [],
+  "scope": "/",
+  "id": "tourex-pwa",
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  },
   "edge_side_panel": {
     "preferred_width": 400
   },
-  "launch_handler": {
-    "client_mode": "navigate-existing"
-  }
+  "handle_links": "preferred",
+  "protocol_handlers": []
 }

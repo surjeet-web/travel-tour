@@ -8,13 +8,17 @@ import {
   PhotoIcon,
   Cog6ToothIcon,
   ArrowRightOnRectangleIcon,
+  DocumentTextIcon,
+  ChatBubbleLeftRightIcon,
+  QuestionMarkCircleIcon,
+  UserGroupIcon,
 } from '@heroicons/react/24/outline';
 import { useAuth } from '../../hooks/useAuth';
 
 interface SidebarItem {
   name: string;
   href: string;
-  icon: React.ComponentType<any>;
+  icon: React.ComponentType<React.SVGProps<SVGSVGElement>>;
 }
 
 const sidebarItems: SidebarItem[] = [
@@ -22,6 +26,10 @@ const sidebarItems: SidebarItem[] = [
   { name: 'Travel Packages', href: '/admin/packages', icon: BuildingOfficeIcon },
   { name: 'Car Rentals', href: '/admin/cars', icon: TruckIcon },
   { name: 'Destinations', href: '/admin/destinations', icon: MapPinIcon },
+  { name: 'Blog Posts', href: '/admin/blog', icon: DocumentTextIcon },
+  { name: 'Testimonials', href: '/admin/testimonials', icon: ChatBubbleLeftRightIcon },
+  { name: 'FAQs', href: '/admin/faqs', icon: QuestionMarkCircleIcon },
+  { name: 'Team Members', href: '/admin/team', icon: UserGroupIcon },
   { name: 'Sliders', href: '/admin/sliders', icon: PhotoIcon },
   { name: 'Settings', href: '/admin/settings', icon: Cog6ToothIcon },
 ];

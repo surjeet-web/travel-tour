@@ -1,10 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   ChevronLeftIcon,
   ChevronRightIcon,
   PencilIcon,
   TrashIcon,
   EyeIcon,
+  MagnifyingGlassIcon,
+  FunnelIcon,
 } from '@heroicons/react/24/outline';
 
 interface Column {
@@ -20,12 +22,17 @@ interface DataTableProps {
   onEdit?: (row: any) => void;
   onDelete?: (row: any) => void;
   onView?: (row: any) => void;
+  onBulkDelete?: (ids: string[]) => void;
+  onBulkUpdate?: (ids: string[], updates: any) => void;
   loading?: boolean;
   pagination?: {
     currentPage: number;
     totalPages: number;
     onPageChange: (page: number) => void;
   };
+  searchable?: boolean;
+  filterable?: boolean;
+  selectable?: boolean;
 }
 
 const DataTable: React.FC<DataTableProps> = ({
@@ -34,13 +41,95 @@ const DataTable: React.FC<DataTableProps> = ({
   onEdit,
   onDelete,
   onView,
+  onBulkDelete,
+  onBulkUpdate,
   loading,
   pagination,
+  searchable = true,
+  filterable = true,
+  selectable = true,
 }) => {
   const [sortConfig, setSortConfig] = useState<{
     key: string;
     direction: 'asc' | 'desc';
   } | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedRows, setSelectedRows] = useState<Set<string>>(new Set());
+  const [filters, setFilters] = useState<Record<string, string>>({});
+
+  // Filter and search data
+  const filteredData = useMemo(() => {
+    let filtered = [...data];
+    
+    // Apply search
+    if (searchTerm) {
+      filtered = filtered.filter(row => 
+        columns.some(col => {
+          const value = row[col.key];
+          return value && value.toString().toLowerCase().includes(searchTerm.toLowerCase());
+        })
+      );
+    }
+    
+    // Apply filters
+    Object.entries(filters).forEach(([key, value]) => {
+      if (value) {
+        filtered = filtered.filter(row => row[key] === value);
+      }
+    });
+    
+    return filtered;
+  }, [data, searchTerm, filters, columns]);
+
+  const sortedData = useMemo(() => {
+    const sortableData = [...filteredData];
+    if (sortConfig !== null) {
+      sortableData.sort((a, b) => {
+        if (a[sortConfig.key] < b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? -1 : 1;
+        }
+        if (a[sortConfig.key] > b[sortConfig.key]) {
+          return sortConfig.direction === 'asc' ? 1 : -1;
+        }
+        return 0;
+      });
+    }
+    return sortableData;
+  }, [filteredData, sortConfig]);
+
+  // Selection handlers
+  const toggleRowSelection = (id: string) => {
+    const newSelected = new Set(selectedRows);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedRows(newSelected);
+  };
+
+  const toggleAllSelection = () => {
+    if (selectedRows.size === sortedData.length && sortedData.length > 0) {
+      setSelectedRows(new Set());
+    } else {
+      setSelectedRows(new Set(sortedData.map(row => row.id).filter(Boolean)));
+    }
+  };
+
+  const handleBulkDelete = () => {
+    if (onBulkDelete && selectedRows.size > 0) {
+      if (confirm(`Are you sure you want to delete ${selectedRows.size} items?`)) {
+        onBulkDelete(Array.from(selectedRows));
+        setSelectedRows(new Set());
+      }
+    }
+  };
+
+  const clearFilters = () => {
+    setSearchTerm('');
+    setFilters({});
+    setSelectedRows(new Set());
+  };
 
   const handleSort = (key: string) => {
     let direction: 'asc' | 'desc' = 'asc';
@@ -54,22 +143,6 @@ const DataTable: React.FC<DataTableProps> = ({
     setSortConfig({ key, direction });
   };
 
-  const sortedData = React.useMemo(() => {
-    let sortableData = [...data];
-    if (sortConfig !== null) {
-      sortableData.sort((a, b) => {
-        if (a[sortConfig.key] < b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? -1 : 1;
-        }
-        if (a[sortConfig.key] > b[sortConfig.key]) {
-          return sortConfig.direction === 'asc' ? 1 : -1;
-        }
-        return 0;
-      });
-    }
-    return sortableData;
-  }, [data, sortConfig]);
-
   if (loading) {
     return (
       <div className="text-center py-8">
@@ -81,10 +154,107 @@ const DataTable: React.FC<DataTableProps> = ({
 
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden">
+      {/* Search and Filter Bar */}
+      {(searchable || filterable) && (
+        <div className="p-4 border-b border-gray-200 bg-gray-50">
+          <div className="flex flex-col sm:flex-row gap-4">
+            {searchable && (
+              <div className="flex-1">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <MagnifyingGlassIcon className="h-5 w-5 text-gray-400" />
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Search..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                  />
+                </div>
+              </div>
+            )}
+            
+            {filterable && (
+              <div className="flex gap-2">
+                {columns.slice(0, 2).map(column => (
+                  <div key={column.key} className="relative">
+                    <select
+                      value={filters[column.key] || ''}
+                      onChange={(e) => setFilters(prev => ({
+                        ...prev,
+                        [column.key]: e.target.value
+                      }))}
+                      className="appearance-none bg-white border border-gray-300 rounded-md py-2 pl-3 pr-8 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
+                    >
+                      <option value="">All {column.label}</option>
+                      {[...new Set(data.map(row => row[column.key]).filter(Boolean))].map(value => (
+                        <option key={value} value={value}>{value}</option>
+                      ))}
+                    </select>
+                    <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                      <FunnelIcon className="h-4 w-4" />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {(searchTerm || Object.values(filters).some(v => v)) && (
+              <button
+                onClick={clearFilters}
+                className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800 border border-gray-300 rounded-md"
+              >
+                Clear
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Bulk Actions Bar */}
+      {selectable && (onBulkDelete || onBulkUpdate) && selectedRows.size > 0 && (
+        <div className="bg-blue-50 border-b border-blue-200 px-4 py-3">
+          <div className="flex items-center justify-between">
+            <div className="text-sm text-blue-800">
+              {selectedRows.size} item{selectedRows.size !== 1 ? 's' : ''} selected
+            </div>
+            <div className="flex gap-2">
+              {onBulkDelete && (
+                <button
+                  onClick={handleBulkDelete}
+                  className="px-3 py-1 text-sm bg-red-600 text-white rounded hover:bg-red-700"
+                >
+                  Delete Selected
+                </button>
+              )}
+              {onBulkUpdate && (
+                <button
+                  onClick={() => {/* Implement bulk update modal */}}
+                  className="px-3 py-1 text-sm bg-green-600 text-white rounded hover:bg-green-700"
+                >
+                  Update Selected
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead className="bg-gray-50">
             <tr>
+              {selectable && (
+                <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <input
+                    type="checkbox"
+                    checked={selectedRows.size === sortedData.length && sortedData.length > 0}
+                    onChange={toggleAllSelection}
+                    className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                  />
+                </th>
+              )}
               {columns.map((column) => (
                 <th
                   key={column.key}
@@ -117,6 +287,16 @@ const DataTable: React.FC<DataTableProps> = ({
           <tbody className="bg-white divide-y divide-gray-200">
             {sortedData.map((row, index) => (
               <tr key={row.id || index} className="hover:bg-gray-50">
+                {selectable && (
+                  <td className="px-4 py-4 whitespace-nowrap">
+                    <input
+                      type="checkbox"
+                      checked={selectedRows.has(row.id)}
+                      onChange={() => toggleRowSelection(row.id)}
+                      className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+                    />
+                  </td>
+                )}
                 {columns.map((column) => (
                   <td key={column.key} className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {column.render ? column.render(row[column.key], row) : row[column.key]}
